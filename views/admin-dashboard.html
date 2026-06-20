@@ -1,0 +1,182 @@
+<!DOCTYPE html><html lang="ar" dir="rtl"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>لوحة الإدارة | شغلاتي HOME</title>
+<link href="https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Almarai',sans-serif;background:#F5F3EE;color:#2B2620}
+.top{background:#1a1510;color:#fff;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.top-logo{font-weight:800;font-size:1.1rem}.top-logo .g{color:#E3C78A}
+.top-r{display:flex;align-items:center;gap:12px;font-size:.82rem}
+.top-r a,.top-r button{color:rgba(255,255,255,.7);background:none;border:none;font-family:inherit;font-size:.82rem;cursor:pointer}
+.top-r a:hover,.top-r button:hover{color:#fff}
+.main{max-width:1000px;margin:0 auto;padding:24px 16px}
+.tabs{display:flex;gap:4px;overflow-x:auto;margin-bottom:24px;padding-bottom:4px;scrollbar-width:none;-ms-overflow-style:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:10px 20px;border-radius:50px;font-size:.85rem;font-weight:600;cursor:pointer;white-space:nowrap;background:#fff;color:#6E665C;transition:all .2s}
+.tab.active{background:#2B2620;color:#fff}
+.page{display:none}.page.active{display:block}
+h1{font-weight:800;font-size:1.3rem;margin-bottom:20px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
+.stat{background:#fff;padding:20px;border-radius:12px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.stat-val{font-weight:800;font-size:1.6rem;color:#A87E2C}.stat-label{font-size:.78rem;color:#6E665C;margin-top:2px}
+.card{background:#fff;border-radius:12px;padding:20px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.card-title{font-weight:800;font-size:.95rem}
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{background:#FBF8F2;padding:10px 12px;font-size:.75rem;font-weight:700;text-align:start;color:#6E665C}
+.tbl td{padding:10px 12px;font-size:.82rem;border-top:1px solid #f5f3ee}
+.btn{padding:8px 18px;border-radius:50px;font-weight:700;font-size:.82rem;cursor:pointer;transition:all .2s;border:none}
+.btn-p{background:linear-gradient(135deg,#C99A3F,#A87E2C);color:#fff}.btn-p:hover{opacity:.9}
+.btn-d{background:#FEE2E2;color:#E53E3E}
+.btn-o{border:1.5px solid #C99A3F;color:#A87E2C;background:transparent}
+.badge{display:inline-block;padding:3px 10px;border-radius:50px;font-size:.7rem;font-weight:700}
+.b-active{background:#D1FAE5;color:#065F46}.b-pending{background:#FEF3C7;color:#92400E}
+.b-expired{background:#FEE2E2;color:#991B1B}.b-suspended{background:#E5E7EB;color:#374151}
+.empty{text-align:center;padding:32px;color:#9E9589;font-size:.88rem}
+.act-code{background:#FBF8F2;padding:16px;border-radius:8px;text-align:center;margin-top:12px;font-size:1.2rem;font-weight:800;letter-spacing:4px;color:#A87E2C;user-select:all}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#2B2620;color:#fff;padding:10px 24px;border-radius:50px;font-size:.82rem;font-weight:600;z-index:200;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.show{opacity:1}
+@media(max-width:768px){.stats{grid-template-columns:1fr 1fr}}
+</style></head><body>
+
+<div class="top">
+  <div class="top-logo"><span class="g">شغلاتي</span> ADMIN</div>
+  <div class="top-r"><a href="/" target="_blank">المتجر</a><button onclick="logout()">خروج</button></div>
+</div>
+
+<div class="main">
+  <div class="tabs" id="tabs"></div>
+  <div id="content"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+var T=localStorage.getItem('sh_token'),U=JSON.parse(localStorage.getItem('sh_user')||'null');
+if(!T||!U||U.role!=='admin'){window.location.href='/login';throw''}
+var API='/api/admin',cur='overview';
+function h(){return{'Content-Type':'application/json','Authorization':'Bearer '+T}}
+function hf(){return{'Authorization':'Bearer '+T}}
+function toast(m){var e=document.getElementById('toast');e.textContent=m;e.classList.add('show');setTimeout(function(){e.classList.remove('show')},2500)}
+function logout(){localStorage.removeItem('sh_token');localStorage.removeItem('sh_user');window.location.href='/login'}
+function fmtP(n){return(parseInt(n)||0).toLocaleString('en')+' د.ع'}
+function fmtD(d){if(!d)return'—';return new Date(d).toLocaleDateString('ar-IQ')}
+function statusBadge(s){var m={'active':'b-active','pending':'b-pending','expired':'b-expired','suspended':'b-suspended','approved':'b-active','rejected':'b-expired'};var labels={'active':'فعّال','pending':'بانتظار','expired':'منتهي','suspended':'موقوف','approved':'مقبول','rejected':'مرفوض'};return'<span class="badge '+(m[s]||'b-pending')+'">'+(labels[s]||s)+'</span>'}
+
+var TABS=[{id:'overview',l:'نظرة عامة'},{id:'requests',l:'طلبات الاشتراك'},{id:'vendors',l:'التجار'},{id:'expiring',l:'تنتهي قريباً'},{id:'codes',l:'رموز التفعيل'},{id:'plans',l:'الباقات'}];
+
+function renderTabs(){
+  var html='';TABS.forEach(function(t){html+='<div class="tab'+(t.id===cur?' active':'')+'" onclick="goTab(\''+t.id+'\')">'+t.l+'</div>'});
+  document.getElementById('tabs').innerHTML=html;
+}
+
+function goTab(t){cur=t;renderTabs();renderContent()}
+
+async function renderContent(){
+  var c=document.getElementById('content');
+  if(cur==='overview')await renderOverview(c);
+  else if(cur==='requests')await renderRequests(c);
+  else if(cur==='vendors')await renderVendors(c);
+  else if(cur==='expiring')await renderExpiring(c);
+  else if(cur==='codes')await renderCodes(c);
+  else if(cur==='plans')await renderPlans(c);
+}
+
+async function renderOverview(c){
+  var r=await fetch(API+'/stats',{headers:hf()});var d=await r.json();
+  c.innerHTML='<h1>نظرة عامة</h1>'+
+    '<div class="stats">'+
+    '<div class="stat"><div class="stat-val">'+d.totalVendors+'</div><div class="stat-label">إجمالي التجار</div></div>'+
+    '<div class="stat"><div class="stat-val">'+d.activeVendors+'</div><div class="stat-label">تجار نشطين</div></div>'+
+    '<div class="stat"><div class="stat-val">'+d.pendingRequests+'</div><div class="stat-label">طلبات بانتظار</div></div>'+
+    '<div class="stat"><div class="stat-val">'+d.expiringSoon+'</div><div class="stat-label">تنتهي خلال 30 يوم</div></div>'+
+    '<div class="stat"><div class="stat-val">'+d.expiring7+'</div><div class="stat-label">تنتهي خلال 7 أيام</div></div>'+
+    '<div class="stat"><div class="stat-val">'+fmtP(d.totalRevenue)+'</div><div class="stat-label">الإيرادات</div></div>'+
+    '</div>';
+}
+
+async function renderRequests(c){
+  var r=await fetch(API+'/requests?status=pending',{headers:hf()});var d=await r.json();
+  var html='<h1>طلبات الاشتراك</h1>';
+  if(!d.requests.length){html+='<div class="empty">لا توجد طلبات جديدة</div>';c.innerHTML=html;return}
+  d.requests.forEach(function(req){
+    html+='<div class="card"><div class="card-head"><div class="card-title">'+req.store_name+' — '+req.vendor_code+'</div>'+statusBadge(req.status)+'</div>'+
+      '<div style="font-size:.82rem;color:#6E665C;margin-bottom:4px">التاجر: '+req.full_name+' | الهاتف: '+req.phone+'</div>'+
+      '<div style="font-size:.82rem;color:#6E665C;margin-bottom:8px">الباقة: <strong>'+req.plan_name+'</strong> ('+fmtP(req.price_iqd)+') | الطلب: '+req.request_code+'</div>'+
+      '<div style="font-size:.78rem;color:#9E9589;margin-bottom:12px">'+fmtD(req.created_at)+'</div>'+
+      '<div style="display:flex;gap:8px"><button class="btn btn-p" onclick="approveReq(\''+req.id+'\')">موافقة وإنشاء رمز</button><button class="btn btn-d" onclick="rejectReq(\''+req.id+'\')">رفض</button></div>'+
+      '<div id="code-'+req.id+'"></div></div>';
+  });
+  c.innerHTML=html;
+}
+
+async function approveReq(id){
+  var r=await fetch(API+'/activate',{method:'POST',headers:h(),body:JSON.stringify({request_id:id})});
+  var d=await r.json();
+  if(!r.ok){toast(d.error);return}
+  var el=document.getElementById('code-'+id);
+  el.innerHTML='<div class="act-code">'+d.activation_code+'</div><div style="font-size:.78rem;color:#6E665C;text-align:center;margin-top:6px">أرسل هذا الرمز للتاجر عبر واتساب — صالح لـ 7 أيام</div>';
+  toast('تم إنشاء رمز التفعيل');
+}
+
+async function rejectReq(id){
+  if(!confirm('رفض هذا الطلب؟'))return;
+  await fetch(API+'/reject',{method:'POST',headers:h(),body:JSON.stringify({request_id:id,notes:'مرفوض'})});
+  toast('تم الرفض');renderContent();
+}
+
+async function renderVendors(c){
+  var r=await fetch(API+'/vendors',{headers:hf()});var d=await r.json();
+  var html='<h1>التجار ('+d.vendors.length+')</h1>';
+  if(!d.vendors.length){html+='<div class="empty">لا يوجد تجار</div>';c.innerHTML=html;return}
+  html+='<table class="tbl"><thead><tr><th>المتجر</th><th>التاجر</th><th>المنتجات</th><th>الحالة</th><th></th></tr></thead><tbody>';
+  d.vendors.forEach(function(v){
+    html+='<tr><td><strong>'+v.store_name+'</strong><br><span style="font-size:.7rem;color:#6E665C">'+v.vendor_code+'</span></td>'+
+      '<td>'+v.full_name+'<br><span style="font-size:.7rem;color:#6E665C">'+v.user_phone+'</span></td>'+
+      '<td>'+v.product_count+'</td>'+
+      '<td>'+statusBadge(v.status)+'</td>'+
+      '<td>'+(v.status==='active'?'<button class="btn btn-d" style="font-size:.7rem" onclick="suspendV(\''+v.id+'\')">تعليق</button>':
+        v.status==='suspended'?'<button class="btn btn-o" style="font-size:.7rem" onclick="unsuspendV(\''+v.id+'\')">إعادة</button>':'')+'</td></tr>';
+  });
+  html+='</tbody></table>';
+  c.innerHTML=html;
+}
+
+async function suspendV(id){if(!confirm('تعليق هذا المتجر؟'))return;await fetch(API+'/suspend/'+id,{method:'POST',headers:hf()});toast('تم التعليق');renderContent()}
+async function unsuspendV(id){await fetch(API+'/unsuspend/'+id,{method:'POST',headers:hf()});toast('تم إعادة التفعيل');renderContent()}
+
+async function renderExpiring(c){
+  var r=await fetch(API+'/expiring?days=30',{headers:hf()});var d=await r.json();
+  var html='<h1>اشتراكات تنتهي قريباً</h1>';
+  if(!d.subscriptions.length){html+='<div class="empty">لا توجد اشتراكات تنتهي قريباً</div>';c.innerHTML=html;return}
+  html+='<table class="tbl"><thead><tr><th>المتجر</th><th>الباقة</th><th>ينتهي</th><th>متبقي</th></tr></thead><tbody>';
+  d.subscriptions.forEach(function(s){
+    var dl=Math.max(0,Math.ceil((new Date(s.expires_at)-new Date())/86400000));
+    html+='<tr><td>'+s.store_name+' ('+s.vendor_code+')</td><td>'+s.plan_name+'</td><td>'+fmtD(s.expires_at)+'</td><td style="color:'+(dl<=7?'#E53E3E':'#92400E')+';font-weight:700">'+dl+' يوم</td></tr>';
+  });
+  html+='</tbody></table>';c.innerHTML=html;
+}
+
+async function renderCodes(c){
+  var r=await fetch(API+'/codes',{headers:hf()});var d=await r.json();
+  var html='<h1>رموز التفعيل</h1>';
+  if(!d.codes.length){html+='<div class="empty">لا توجد رموز</div>';c.innerHTML=html;return}
+  html+='<table class="tbl"><thead><tr><th>الرمز</th><th>المتجر</th><th>الباقة</th><th>الحالة</th><th>التاريخ</th></tr></thead><tbody>';
+  d.codes.forEach(function(ac){
+    var used=ac.is_used?'<span class="badge b-active">مُستخدم</span>':new Date(ac.expires_at)<new Date()?'<span class="badge b-expired">منتهي</span>':'<span class="badge b-pending">متاح</span>';
+    html+='<tr><td style="font-family:monospace;font-size:.8rem;letter-spacing:1px">'+ac.code+'</td><td>'+ac.store_name+'</td><td>'+ac.plan_name+'</td><td>'+used+'</td><td style="font-size:.75rem">'+fmtD(ac.created_at)+'</td></tr>';
+  });
+  html+='</tbody></table>';c.innerHTML=html;
+}
+
+async function renderPlans(c){
+  var r=await fetch(API+'/plans',{headers:hf()});var d=await r.json();
+  var html='<h1>الباقات</h1>';
+  html+='<table class="tbl"><thead><tr><th>الباقة</th><th>السعر</th><th>المنتجات</th><th>الأقسام</th><th>المدة</th><th>موثّق</th></tr></thead><tbody>';
+  d.plans.forEach(function(p){
+    html+='<tr><td><strong>'+p.name_ar+'</strong></td><td>'+fmtP(p.price_iqd)+'</td><td>'+(p.max_products===-1?'∞':p.max_products)+'</td><td>'+(p.max_categories===-1?'∞':p.max_categories)+'</td><td>'+p.duration_days+' يوم</td><td>'+(p.is_verified?'نعم':'لا')+'</td></tr>';
+  });
+  html+='</tbody></table>';c.innerHTML=html;
+}
+
+renderTabs();renderContent();
+</script></body></html>

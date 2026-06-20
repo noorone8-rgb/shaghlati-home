@@ -1,0 +1,115 @@
+<!DOCTYPE html><html lang="ar" dir="rtl"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>متجر | شغلاتي HOME</title>
+<link href="https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Almarai',sans-serif;background:#FBF8F2;color:#2B2620}
+.cover{height:200px;background:linear-gradient(135deg,#C99A3F,#A87E2C);position:relative;display:flex;align-items:flex-end}
+.cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.cover-overlay{position:absolute;inset:0;background:linear-gradient(transparent 40%,rgba(0,0,0,.5) 100%)}
+.store-info{position:relative;z-index:2;padding:0 20px 20px;color:#fff;display:flex;align-items:flex-end;gap:16px;width:100%;max-width:1000px;margin:0 auto}
+.store-logo{width:72px;height:72px;border-radius:16px;background:#fff;overflow:hidden;flex-shrink:0;box-shadow:0 4px 12px rgba(0,0,0,.2);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.2rem;color:#C99A3F}
+.store-logo img{width:100%;height:100%;object-fit:cover}
+.store-meta h1{font-weight:800;font-size:1.3rem;margin-bottom:2px;text-shadow:0 1px 4px rgba(0,0,0,.3)}
+.store-meta p{font-size:.82rem;opacity:.85}
+.verified{display:inline-block;background:#D1FAE5;color:#065F46;font-size:.65rem;font-weight:700;padding:2px 8px;border-radius:50px;margin-right:6px}
+.ctn{max-width:1000px;margin:0 auto;padding:0 16px}
+.store-desc{padding:20px 0;font-size:.9rem;color:#6E665C;line-height:1.8}
+.cats{display:flex;gap:8px;overflow-x:auto;padding:12px 0;scrollbar-width:none;-ms-overflow-style:none;border-bottom:1px solid rgba(201,154,63,.08);margin-bottom:24px}
+.cats::-webkit-scrollbar{display:none}
+.cat-btn{padding:8px 20px;border-radius:50px;font-size:.82rem;font-weight:600;cursor:pointer;white-space:nowrap;background:#fff;color:#6E665C;border:1px solid rgba(201,154,63,.12);transition:all .2s}
+.cat-btn.active{background:#2B2620;color:#fff;border-color:transparent}
+.pg{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;padding-bottom:48px}
+.pc{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.05);cursor:pointer;transition:transform .2s}
+.pc:hover{transform:translateY(-3px)}
+.pc-img{aspect-ratio:1;overflow:hidden;background:#f5f5f5;display:flex;align-items:center;justify-content:center;color:#9E9589;font-size:.85rem}
+.pc-img img{width:100%;height:100%;object-fit:cover}
+.pc-info{padding:12px}
+.pc-name{font-weight:700;font-size:.85rem;margin-bottom:4px;line-height:1.4}
+.pc-pr{font-weight:800;font-size:.95rem;color:#A87E2C}
+.pc-old{font-size:.75rem;color:#9E9589;text-decoration:line-through;margin-right:6px}
+.pc-btn{display:block;width:100%;padding:10px;background:linear-gradient(135deg,#C99A3F,#A87E2C);color:#fff;border:none;border-radius:8px;font-weight:700;font-size:.82rem;cursor:pointer;margin-top:8px;text-align:center;transition:opacity .15s}
+.pc-btn:hover{opacity:.9}
+.sold-by{font-size:.72rem;color:#9E9589;margin-top:6px}
+.empty{text-align:center;padding:48px;color:#9E9589;grid-column:1/-1}
+.back{display:inline-block;padding:8px 20px;margin:16px 0;font-size:.82rem;color:#A87E2C;font-weight:700}
+.social-links{display:flex;gap:8px;padding:8px 0}
+.social-links a{padding:6px 16px;border-radius:50px;font-size:.78rem;font-weight:700;color:#fff;transition:opacity .15s}
+.social-links a:hover{opacity:.85}
+@media(min-width:768px){.pg{grid-template-columns:repeat(3,1fr)}.cover{height:280px}}
+@media(min-width:1024px){.pg{grid-template-columns:repeat(4,1fr)}}
+</style></head><body>
+
+<div id="app"></div>
+
+<script>
+var slug=window.location.pathname.split('/store/')[1];
+if(!slug){window.location.href='/';throw''}
+var WA='9647893799524';
+
+function esc(s){var d=document.createElement('div');d.textContent=s||'';return d.innerHTML}
+function fmtP(n){return(parseInt(n)||0).toLocaleString('en')+' د.ع'}
+
+async function loadStore(){
+  try{
+    var r=await fetch('/api/store/'+slug);
+    if(!r.ok){document.getElementById('app').innerHTML='<div style="text-align:center;padding:80px 20px"><h2>المتجر غير موجود</h2><a href="/" class="back">العودة للرئيسية</a></div>';return}
+    var d=await r.json();
+    renderStore(d.vendor,d.categories,d.products);
+  }catch(e){document.getElementById('app').innerHTML='<div style="text-align:center;padding:80px">خطأ في التحميل</div>'}
+}
+
+function renderStore(v,cats,prods){
+  var coverImg=v.cover_url?'<img src="'+v.cover_url+'" alt="">':'';
+  var logoImg=v.logo_url?'<img src="'+v.logo_url+'" alt="'+esc(v.store_name)+'">':esc(v.store_name).substring(0,2);
+  var verifiedH=v.is_verified?'<span class="verified">موثّق</span>':'';
+
+  var html='<div class="cover" style="'+(v.primary_color?'background:linear-gradient(135deg,'+v.primary_color+','+v.secondary_color+')':'')+'">' +
+    coverImg+'<div class="cover-overlay"></div>'+
+    '<div class="store-info"><div class="store-logo">'+logoImg+'</div><div class="store-meta"><h1>'+esc(v.store_name)+verifiedH+'</h1><p>'+(v.business_type||'')+'</p></div></div></div>';
+
+  html+='<div class="ctn"><a href="/" class="back">العودة للرئيسية</a>';
+  if(v.store_desc)html+='<div class="store-desc">'+esc(v.store_desc)+'</div>';
+
+  // Social links
+  var socials='';
+  if(v.whatsapp)socials+='<a href="https://wa.me/'+v.whatsapp+'" target="_blank" style="background:#25D366">واتساب</a>';
+  if(v.social_facebook)socials+='<a href="'+esc(v.social_facebook)+'" target="_blank" style="background:#1877F2">فيسبوك</a>';
+  if(v.social_instagram)socials+='<a href="'+esc(v.social_instagram)+'" target="_blank" style="background:linear-gradient(135deg,#833AB4,#E1306C)">انستغرام</a>';
+  if(socials)html+='<div class="social-links">'+socials+'</div>';
+
+  // Categories filter
+  html+='<div class="cats"><div class="cat-btn active" onclick="filterProds(null,this)">الكل</div>';
+  cats.forEach(function(c){html+='<div class="cat-btn" onclick="filterProds(\''+c.id+'\',this)">'+esc(c.name)+'</div>'});
+  html+='</div>';
+
+  // Products
+  html+='<div class="pg" id="prodGrid">';
+  if(!prods.length)html+='<div class="empty">لا توجد منتجات حالياً</div>';
+  prods.forEach(function(p){html+=prodCard(p,v)});
+  html+='</div></div>';
+
+  document.getElementById('app').innerHTML=html;
+  window._prods=prods;window._vendor=v;
+}
+
+function prodCard(p,v){
+  var img=p.images&&p.images.length?'<img src="'+p.images[0]+'" alt="'+esc(p.name)+'" loading="lazy">':esc(p.category_name||'');
+  var hd=p.old_price&&p.old_price>p.price;
+  var waNum=v.whatsapp||WA;
+  var msg='أهلاً، أريد الاستفسار عن المنتج:\n'+p.name+' ('+p.product_code+')\nالسعر: '+fmtP(p.price);
+  return'<div class="pc"><div class="pc-img">'+img+'</div><div class="pc-info"><div class="pc-name">'+esc(p.name)+'</div><div style="display:flex;align-items:baseline;gap:6px"><span class="pc-pr">'+fmtP(p.price)+'</span>'+(hd?'<span class="pc-old">'+fmtP(p.old_price)+'</span>':'')+'</div><a class="pc-btn" href="https://wa.me/'+waNum+'?text='+encodeURIComponent(msg)+'" target="_blank">اطلب الآن</a><div class="sold-by">يُباع بواسطة: '+esc(v.store_name)+'</div></div></div>';
+}
+
+function filterProds(catId,btn){
+  document.querySelectorAll('.cat-btn').forEach(function(b){b.classList.remove('active')});
+  btn.classList.add('active');
+  var prods=window._prods,v=window._vendor;
+  var filtered=catId?prods.filter(function(p){return p.category_id===catId}):prods;
+  var grid=document.getElementById('prodGrid');
+  if(!filtered.length){grid.innerHTML='<div class="empty">لا توجد منتجات في هذا القسم</div>';return}
+  var html='';filtered.forEach(function(p){html+=prodCard(p,v)});grid.innerHTML=html;
+}
+
+loadStore();
+</script></body></html>

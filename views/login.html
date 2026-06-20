@@ -1,0 +1,51 @@
+<!DOCTYPE html><html lang="ar" dir="rtl"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>تسجيل الدخول | شغلاتي HOME</title>
+<link href="https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Almarai',sans-serif;background:#FBF8F2;color:#2B2620;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}
+.card{background:#fff;border-radius:16px;padding:40px 32px;width:100%;max-width:400px;box-shadow:0 4px 24px rgba(43,38,32,.08)}
+.logo{text-align:center;font-weight:800;font-size:1.4rem;margin-bottom:8px}.logo .g{color:#C99A3F}.logo .p{color:#DDA0A2}
+h2{text-align:center;font-weight:800;font-size:1.1rem;margin-bottom:24px;color:#6E665C}
+.fg{margin-bottom:16px}label{display:block;font-weight:700;font-size:.85rem;margin-bottom:5px}
+input{width:100%;padding:12px 14px;border:1.5px solid rgba(201,154,63,.15);border-radius:8px;background:#FBF8F2;outline:none;font-size:.9rem;transition:border-color .2s}
+input:focus{border-color:#C99A3F}
+.btn{width:100%;padding:14px;background:linear-gradient(135deg,#C99A3F,#A87E2C);color:#fff;border:none;border-radius:50px;font-weight:800;font-size:1rem;cursor:pointer;transition:opacity .2s;margin-top:8px}
+.btn:hover{opacity:.9}.btn:disabled{opacity:.5;cursor:default}
+.err{color:#E53E3E;font-size:.82rem;text-align:center;margin-top:12px;display:none}
+.link{text-align:center;margin-top:20px;font-size:.85rem;color:#6E665C}
+.link a{color:#C99A3F;font-weight:700}
+</style></head><body>
+<div class="card">
+  <div class="logo"><span class="g">شغلاتي</span> <span class="p">HOME</span></div>
+  <h2>تسجيل الدخول</h2>
+  <div class="fg"><label>رقم الهاتف</label><input type="tel" id="phone" placeholder="07XX XXX XXXX" dir="ltr" style="text-align:right" maxlength="15"></div>
+  <div class="fg"><label>كلمة المرور</label><input type="password" id="pass" placeholder="كلمة المرور" maxlength="50"></div>
+  <button class="btn" id="loginBtn" onclick="doLogin()">دخول</button>
+  <div class="err" id="err"></div>
+  <div class="link">ليس لديك حساب؟ <a href="/register">سجّل الآن</a></div>
+  <div class="link"><a href="/">العودة للمتجر</a></div>
+</div>
+<script>
+async function doLogin(){
+  var btn=document.getElementById('loginBtn'),err=document.getElementById('err');
+  var phone=document.getElementById('phone').value.trim(),pass=document.getElementById('pass').value;
+  if(!phone||!pass){err.textContent='أدخل الهاتف وكلمة المرور';err.style.display='block';return}
+  btn.disabled=true;err.style.display='none';
+  try{
+    var r=await fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone:phone,password:pass})});
+    var d=await r.json();
+    if(!r.ok){err.textContent=d.error;err.style.display='block';btn.disabled=false;return}
+    localStorage.setItem('sh_token',d.token);localStorage.setItem('sh_user',JSON.stringify(d.user));
+    if(d.user.role==='admin')window.location.href='/admin/';
+    else if(d.user.role==='vendor')window.location.href='/vendor/';
+    else window.location.href='/';
+  }catch(e){err.textContent='خطأ في الاتصال';err.style.display='block';btn.disabled=false}
+}
+document.getElementById('pass').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin()});
+if(localStorage.getItem('sh_token')){
+  var u=JSON.parse(localStorage.getItem('sh_user')||'{}');
+  if(u.role==='admin')window.location.href='/admin/';
+  else if(u.role==='vendor')window.location.href='/vendor/';
+}
+</script></body></html>
