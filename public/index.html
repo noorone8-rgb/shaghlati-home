@@ -22,14 +22,16 @@
   --text:#1A3C34;--text2:#3D5C52;--text3:#6B8A80;
   --wa:#25D366;--red:#C53030;
   --cat1:#1A3C34;--cat2:#245347;--cat3:#2D6455;--cat4:#1A3C34;
-  --r:12px;--rs:8px;
+  --r:14px;--rs:8px;
   --sh:0 2px 16px rgba(0,0,0,.3);--sh2:0 8px 32px rgba(0,0,0,.4);
   --f:'Almarai',sans-serif;
-  --top:36px;--nav:60px;
+  --top:36px;--nav:64px;
 }
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{font-family:var(--f);background:var(--bg);color:var(--text);line-height:1.7;-webkit-font-smoothing:antialiased}
+body{font-family:var(--f);background:var(--bg);color:var(--text);line-height:1.7;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+::selection{background:var(--gold);color:var(--green-d)}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:4px}
 img{max-width:100%;display:block}
 button{cursor:pointer;font-family:inherit;border:none;background:none}
 input,select,textarea{font-family:inherit;font-size:1rem}
@@ -46,10 +48,11 @@ a{text-decoration:none;color:inherit}
 .cart-count{background:var(--gold);color:var(--green-d);font-size:.6rem;font-weight:800;min-width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-right:-2px}
 
 /* ── Nav ── */
-.nav{background:rgba(242,232,213,.97);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);height:var(--nav);position:sticky;top:0;z-index:110;border-bottom:1px solid rgba(26,60,52,.08);transition:box-shadow .3s}
-.nav.scrolled{box-shadow:0 2px 20px rgba(26,60,52,.08)}
+.nav{background:rgba(242,232,213,.95);backdrop-filter:blur(20px) saturate(1.2);-webkit-backdrop-filter:blur(20px) saturate(1.2);height:var(--nav);position:sticky;top:0;z-index:110;border-bottom:1px solid rgba(26,60,52,.06);transition:box-shadow .3s,background .3s}
+.nav.scrolled{box-shadow:0 4px 24px rgba(26,60,52,.1);background:rgba(242,232,213,.98)}
 .nav .ctn{display:flex;align-items:center;justify-content:space-between;height:100%}
 .nav-logo{display:flex;align-items:center;gap:5px;font-weight:800;font-size:1.2rem}
+.nav-logo-img{height:38px;width:auto;display:block}
 .nav-logo-g{color:var(--green)}
 .nav-logo-p{color:var(--gold);font-weight:700}
 .nav-links{display:none;align-items:center;gap:24px}
@@ -73,7 +76,8 @@ a{text-decoration:none;color:inherit}
 .mobile-search input{width:100%;padding:12px 16px;border:1.5px solid rgba(26,60,52,.1);border-radius:var(--rs);background:var(--card);font-size:.9rem;outline:none;color:var(--text)}
 
 /* ── Hero Slider ── */
-.hero{position:relative;overflow:hidden;background:linear-gradient(135deg,var(--green-d) 0%,var(--green) 50%,#1A3C34 100%);min-height:360px}
+.hero{position:relative;overflow:hidden;background:linear-gradient(160deg,var(--green-d) 0%,var(--green) 40%,#1E4A3F 100%);min-height:380px}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 80% 20%,rgba(196,162,101,.08) 0%,transparent 60%);pointer-events:none}
 .hero-slider{display:flex;transition:transform .5s ease;touch-action:pan-y}
 .hero-slide{min-width:100%;padding:48px 0 40px;display:grid;grid-template-columns:1fr;gap:32px;align-items:center}
 .hero-content{text-align:center;order:2;color:#fff}
@@ -126,17 +130,27 @@ a{text-decoration:none;color:inherit}
 .sec-more:hover{opacity:.7}
 .sec-center{text-align:center}
 
-/* ── Categories ── */
-.cat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-.cat-card{padding:28px 16px;border-radius:var(--r);text-align:center;cursor:pointer;transition:transform .25s,box-shadow .25s;border:1px solid rgba(26,60,52,.08);color:var(--green);font-weight:800;font-size:1rem;background:var(--card)}
-.cat-card:hover{transform:translateY(-3px);border-color:var(--green);background:rgba(26,60,52,.03)}
-.cat-card.active{border-color:var(--green);box-shadow:0 4px 16px rgba(26,60,52,.1);background:rgba(26,60,52,.05)}
-.c1,.c2,.c3,.c4{background:var(--card)}
+/* ── Categories (circular, single scrollable row) ── */
+.cat-grid{display:flex;flex-wrap:nowrap;gap:18px;overflow-x:auto;overflow-y:hidden;padding:6px 2px 14px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:rgba(26,60,52,.25) transparent}
+.cat-grid::-webkit-scrollbar{height:6px}
+.cat-grid::-webkit-scrollbar-thumb{background:rgba(26,60,52,.2);border-radius:50px}
+.cat-grid::-webkit-scrollbar-track{background:transparent}
+.cat-circle{flex:0 0 auto;scroll-snap-align:start;display:flex;flex-direction:column;align-items:center;gap:10px;cursor:pointer;background:none;border:none;padding:0;width:90px}
+.cat-ph{width:84px;height:84px;border-radius:50%;overflow:hidden;border:2.5px solid rgba(26,60,52,.1);box-shadow:0 4px 14px rgba(26,60,52,.1);transition:transform .3s cubic-bezier(.4,0,.2,1),border-color .3s,box-shadow .3s;background:var(--card)}
+.cat-ph img{width:100%;height:100%;object-fit:cover;display:block}
+.cat-nm{font-size:.82rem;font-weight:800;color:var(--green);line-height:1.3;text-align:center;transition:color .25s}
+.cat-circle:hover .cat-ph{transform:translateY(-4px) scale(1.04);border-color:var(--gold);box-shadow:0 10px 26px rgba(196,162,101,.28)}
+.cat-circle:focus-visible{outline:none}
+.cat-circle:focus-visible .cat-ph{border-color:var(--gold);box-shadow:0 0 0 4px rgba(196,162,101,.25)}
+.cat-circle.active .cat-ph{border-color:var(--green);box-shadow:0 4px 16px rgba(26,60,52,.3)}
+.cat-circle.active .cat-nm{color:var(--green-d)}
 
 /* ── Product Card ── */
 .pg{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
-.pc{background:var(--card);border-radius:var(--r);overflow:hidden;box-shadow:0 2px 12px rgba(26,60,52,.06);transition:transform .25s,box-shadow .25s;display:flex;flex-direction:column;cursor:pointer;border:1px solid rgba(26,60,52,.06)}
-.pc:hover{transform:translateY(-4px);box-shadow:0 8px 28px rgba(26,60,52,.1);border-color:rgba(26,60,52,.12)}
+.pc{background:var(--card);border-radius:var(--r);overflow:hidden;box-shadow:0 2px 12px rgba(26,60,52,.06);transition:transform .3s cubic-bezier(.4,0,.2,1),box-shadow .3s;display:flex;flex-direction:column;cursor:pointer;border:1px solid rgba(26,60,52,.06)}
+.pc:hover{transform:translateY(-6px);box-shadow:0 12px 32px rgba(26,60,52,.12);border-color:rgba(196,162,101,.2)}
+.pc:hover .pc-img img{transform:scale(1.05)}
+.pc-img img{transition:transform .4s cubic-bezier(.4,0,.2,1)}
 .pc-img{position:relative;aspect-ratio:1;overflow:hidden;background:var(--cream)}
 .pc-img img{width:100%;height:100%;object-fit:cover}
 .pc-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:.85rem;color:var(--gold-d);font-weight:600}
@@ -172,7 +186,8 @@ a{text-decoration:none;color:inherit}
 
 /* ── Testimonials ── */
 .rev-grid{display:grid;grid-template-columns:1fr;gap:16px}
-.rev-card{background:var(--card);padding:24px;border-radius:var(--r);box-shadow:0 2px 12px rgba(26,60,52,.05);border-right:3px solid var(--gold)}
+.rev-card{background:var(--card);padding:24px;border-radius:var(--r);box-shadow:0 2px 12px rgba(26,60,52,.05);border-right:3px solid var(--gold);transition:transform .3s cubic-bezier(.4,0,.2,1),box-shadow .3s}
+.rev-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(26,60,52,.08)}
 .rev-stars{color:var(--gold);font-size:.85rem;margin-bottom:8px}
 .rev-text{font-size:.88rem;line-height:1.8;margin-bottom:12px;color:var(--text)}
 .rev-name{font-weight:700;font-size:.85rem;color:var(--gold-d)}
@@ -221,8 +236,9 @@ a{text-decoration:none;color:inherit}
 .cart-checkout:hover{opacity:.9}
 
 /* ── Floating WA ── */
-.wa-float{position:fixed;bottom:24px;left:24px;z-index:90;width:52px;height:52px;background:var(--wa);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:800;box-shadow:0 4px 16px rgba(37,211,102,.35);transition:transform .2s}
-.wa-float:hover{transform:scale(1.08)}
+.wa-float{position:fixed;bottom:24px;left:24px;z-index:90;width:56px;height:56px;background:var(--wa);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(37,211,102,.4);transition:transform .3s cubic-bezier(.4,0,.2,1),box-shadow .3s;animation:waPulse 3s ease-in-out infinite}
+.wa-float:hover{transform:scale(1.12);box-shadow:0 6px 28px rgba(37,211,102,.5)}
+@keyframes waPulse{0%,100%{box-shadow:0 4px 20px rgba(37,211,102,.4)}50%{box-shadow:0 4px 20px rgba(37,211,102,.4),0 0 0 8px rgba(37,211,102,.1)}}
 
 /* ── Modal ── */
 .modal-ov{display:none;position:fixed;inset:0;z-index:220;background:rgba(43,38,32,.5);backdrop-filter:blur(4px);align-items:flex-end;justify-content:center}
@@ -291,11 +307,13 @@ a{text-decoration:none;color:inherit}
 .adm-sb{padding:14px}
 .adm-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
 .adm-row.full{grid-template-columns:1fr}
-.adm-i{width:100%;padding:9px 11px;border:1.5px solid rgba(201,154,63,.12);border-radius:var(--rs);background:var(--card);font-size:.85rem;outline:none}
-.adm-i:focus{border-color:var(--gold)}
-.adm-sel{width:100%;padding:9px 11px;border:1.5px solid rgba(201,154,63,.12);border-radius:var(--rs);background:var(--card);font-size:.85rem;outline:none;appearance:none}
-.adm-ta{width:100%;padding:9px 11px;border:1.5px solid rgba(201,154,63,.12);border-radius:var(--rs);background:var(--card);font-size:.85rem;outline:none;resize:vertical;min-height:60px;line-height:1.6}
-.adm-ta:focus,.adm-sel:focus{border-color:var(--gold)}
+.adm-i{width:100%;padding:10px 12px;border:1.5px solid rgba(26,60,52,.2);border-radius:var(--rs);background:#fff;color:var(--green-d);font-size:.85rem;font-weight:600;outline:none;transition:border-color .2s,box-shadow .2s}
+.adm-i::placeholder{color:var(--text3);font-weight:400}
+.adm-i:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(26,60,52,.08)}
+.adm-sel{width:100%;padding:10px 12px;border:1.5px solid rgba(26,60,52,.2);border-radius:var(--rs);background:#fff;color:var(--green-d);font-size:.85rem;font-weight:600;outline:none;appearance:none;transition:border-color .2s,box-shadow .2s}
+.adm-ta{width:100%;padding:10px 12px;border:1.5px solid rgba(26,60,52,.2);border-radius:var(--rs);background:#fff;color:var(--green-d);font-size:.85rem;font-weight:600;outline:none;resize:vertical;min-height:60px;line-height:1.6;transition:border-color .2s,box-shadow .2s}
+.adm-ta::placeholder{color:var(--text3);font-weight:400}
+.adm-ta:focus,.adm-sel:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(26,60,52,.08)}
 .adm-up{border:2px dashed rgba(201,154,63,.15);border-radius:var(--rs);padding:16px;text-align:center;cursor:pointer;position:relative;font-size:.82rem;color:var(--text2)}
 .adm-up:hover{border-color:var(--gold)}
 .adm-up input{position:absolute;inset:0;opacity:0;cursor:pointer}
@@ -323,11 +341,15 @@ a{text-decoration:none;color:inherit}
 
 /* ── Animations ── */
 @keyframes slideU{from{transform:translateY(100%)}to{transform:translateY(0)}}
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+.sec{opacity:0;transform:translateY(24px);transition:opacity .6s cubic-bezier(.4,0,.2,1),transform .6s cubic-bezier(.4,0,.2,1)}
+.sec.visible{opacity:1;transform:translateY(0)}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}.sec{opacity:1;transform:none}}
 
 /* ── Responsive ── */
 @media(min-width:768px){
-  .cat-grid{grid-template-columns:repeat(4,1fr)}
+  .cat-grid{gap:22px;justify-content:flex-start}
+  .cat-ph{width:92px;height:92px}
+  .cat-circle{width:100px}
   .pg{grid-template-columns:repeat(3,1fr)}
   .rev-grid{grid-template-columns:repeat(3,1fr)}
   .promo-grid{grid-template-columns:repeat(2,1fr)}
@@ -360,7 +382,6 @@ a{text-decoration:none;color:inherit}
     <div class="topbar-actions">
       <button class="topbar-btn" onclick="openCart()">السلة <span class="cart-count" id="cartCount">0</span></button>
     </div>
-    <div class="topbar-center">توصيل مجاني للطلبات فوق 50,000 د.ع</div>
     <div class="topbar-actions">
       <span class="topbar-btn">العربية</span>
     </div>
@@ -371,7 +392,7 @@ a{text-decoration:none;color:inherit}
 <nav class="nav" id="mainNav">
   <div class="ctn">
     <a href="#" class="nav-logo" onclick="window.scrollTo({top:0,behavior:'smooth'});return false">
-      <span class="nav-logo-g">شغلاتي</span><span class="nav-logo-p">HOME</span>
+      <img src="/logo.svg" alt="شغلاتي HOME" class="nav-logo-img">
     </a>
     <div class="nav-links">
       <span class="nav-link active" onclick="window.scrollTo({top:0,behavior:'smooth'})">الرئيسية</span>
@@ -384,8 +405,8 @@ a{text-decoration:none;color:inherit}
       <div class="search-results" id="searchResults"></div>
     </div>
     <div class="nav-mobile-btns">
-      <button class="nav-mob-btn" onclick="openCart()" aria-label="السلة">&#9776;</button>
-      <button class="nav-mob-btn menu-btn" onclick="toggleMenu()" aria-label="القائمة">&#9776;</button>
+      <button class="nav-mob-btn" onclick="openCart()" aria-label="السلة"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg></button>
+      <button class="nav-mob-btn menu-btn" onclick="toggleMenu()" aria-label="القائمة"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
     </div>
   </div>
 </nav>
@@ -417,10 +438,18 @@ a{text-decoration:none;color:inherit}
   <div class="ctn">
     <div class="sec-center"><h2 class="sec-title">تصفّح الأقسام</h2><p class="sec-sub">اختر القسم اللي يناسبك</p></div>
     <div class="cat-grid">
-      <div class="cat-card c1" onclick="filterCat('كهربائيات')" role="button" tabindex="0">كهربائيات</div>
-      <div class="cat-card c2" onclick="filterCat('أدوات منزلية')" role="button" tabindex="0">أدوات منزلية</div>
-      <div class="cat-card c3" onclick="filterCat('ألعاب')" role="button" tabindex="0">ألعاب أطفال</div>
-      <div class="cat-card c4" onclick="filterCat('هدايا')" role="button" tabindex="0">هدايا</div>
+      <button class="cat-circle" onclick="filterCat('أجهزة كهربائية')"><span class="cat-ph"><img src="/cat/electric.jpg" alt="أجهزة كهربائية"></span><span class="cat-nm">أجهزة كهربائية</span></button>
+      <button class="cat-circle" onclick="filterCat('أدوات منزلية')"><span class="cat-ph"><img src="/cat/home.jpg" alt="أدوات منزلية"></span><span class="cat-nm">أدوات منزلية</span></button>
+      <button class="cat-circle" onclick="filterCat('ألعاب')"><span class="cat-ph"><img src="/cat/toys.jpg" alt="ألعاب أطفال"></span><span class="cat-nm">ألعاب أطفال</span></button>
+      <button class="cat-circle" onclick="filterCat('هدايا')"><span class="cat-ph"><img src="/cat/gifts.jpg" alt="هدايا"></span><span class="cat-nm">هدايا</span></button>
+      <button class="cat-circle" onclick="filterCat('أجهزة العناية')"><span class="cat-ph"><img src="/cat/care-devices.jpg" alt="أجهزة العناية"></span><span class="cat-nm">أجهزة العناية</span></button>
+      <button class="cat-circle" onclick="filterCat('أدوات مطبخ')"><span class="cat-ph"><img src="/cat/kitchen.jpg" alt="أدوات مطبخ"></span><span class="cat-nm">أدوات مطبخ</span></button>
+      <button class="cat-circle" onclick="filterCat('عدد وأدوات')"><span class="cat-ph"><img src="/cat/tools.jpg" alt="عدد وأدوات"></span><span class="cat-nm">عدد وأدوات</span></button>
+      <button class="cat-circle" onclick="filterCat('حقائب')"><span class="cat-ph"><img src="/cat/bags.jpg" alt="حقائب"></span><span class="cat-nm">حقائب</span></button>
+      <button class="cat-circle" onclick="filterCat('مستلزمات التخييم')"><span class="cat-ph"><img src="/cat/camping.jpg" alt="مستلزمات التخييم"></span><span class="cat-nm">مستلزمات التخييم</span></button>
+      <button class="cat-circle" onclick="filterCat('منتجات العناية')"><span class="cat-ph"><img src="/cat/care.jpg" alt="منتجات العناية"></span><span class="cat-nm">منتجات العناية</span></button>
+      <button class="cat-circle" onclick="filterCat('إلكترونيات')"><span class="cat-ph"><img src="/cat/electronics.jpg" alt="إلكترونيات"></span><span class="cat-nm">إلكترونيات</span></button>
+      <button class="cat-circle" onclick="filterCat('اكسسوارات')"><span class="cat-ph"><img src="/cat/accessories.jpg" alt="اكسسوارات"></span><span class="cat-nm">اكسسوارات</span></button>
     </div>
   </div>
 </section>
@@ -468,10 +497,10 @@ a{text-decoration:none;color:inherit}
   <div class="ctn">
     <div class="sec-center"><h2 class="sec-title">لماذا نحن</h2><p class="sec-sub">أسباب تخلّيك تختار شغلاتي HOME</p></div>
     <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px">
-      <div style="background:rgba(255,255,255,.08);padding:24px 16px;border-radius:var(--r);text-align:center;border:1px solid rgba(196,162,101,.12)"><div style="font-weight:800;font-size:.95rem;margin-bottom:4px">توصيل لكل العراق</div><div style="font-size:.8rem">نوصّل لكل المحافظات بسعر موحّد</div></div>
-      <div style="background:rgba(255,255,255,.08);padding:24px 16px;border-radius:var(--r);text-align:center;border:1px solid rgba(196,162,101,.12)"><div style="font-weight:800;font-size:.95rem;margin-bottom:4px">دفع عند الاستلام</div><div style="font-size:.8rem">ما تدفع إلا لمن يوصلك المنتج</div></div>
-      <div style="background:rgba(255,255,255,.08);padding:24px 16px;border-radius:var(--r);text-align:center;border:1px solid rgba(196,162,101,.12)"><div style="font-weight:800;font-size:.95rem;margin-bottom:4px">جودة مضمونة</div><div style="font-size:.8rem">منتجات مختارة بعناية وجودة عالية</div></div>
-      <div style="background:rgba(255,255,255,.08);padding:24px 16px;border-radius:var(--r);text-align:center;border:1px solid rgba(196,162,101,.12)"><div style="font-weight:800;font-size:.95rem;margin-bottom:4px">استبدال وإرجاع</div><div style="font-size:.8rem">راحة بالك مع سياسة إرجاع مرنة</div></div>
+      <div style="background:rgba(255,255,255,.08);padding:28px 16px;border-radius:var(--r);text-align:center;border:1px solid rgba(196,162,101,.12);transition:transform .3s,border-color .3s" onmouseover="this.style.transform='translateY(-3px)';this.style.borderColor='rgba(196,162,101,.3)'" onmouseout="this.style.transform='';this.style.borderColor='rgba(196,162,101,.12)'"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--gold-l)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:10px"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg><div style="font-weight:800;font-size:.95rem;margin-bottom:4px">توصيل لكل العراق</div><div style="font-size:.8rem">نوصّل لكل المحافظات بسعر موحّد</div></div>
+      <div style="background:rgba(255,255,255,.08);padding:28px 16px;border-radius:var(--r);text-align:center;border:1px solid rgba(196,162,101,.12);transition:transform .3s,border-color .3s" onmouseover="this.style.transform='translateY(-3px)';this.style.borderColor='rgba(196,162,101,.3)'" onmouseout="this.style.transform='';this.style.borderColor='rgba(196,162,101,.12)'"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--gold-l)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:10px"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg><div style="font-weight:800;font-size:.95rem;margin-bottom:4px">دفع عند الاستلام</div><div style="font-size:.8rem">ما تدفع إلا لمن يوصلك المنتج</div></div>
+      <div style="background:rgba(255,255,255,.08);padding:28px 16px;border-radius:var(--r);text-align:center;border:1px solid rgba(196,162,101,.12);transition:transform .3s,border-color .3s" onmouseover="this.style.transform='translateY(-3px)';this.style.borderColor='rgba(196,162,101,.3)'" onmouseout="this.style.transform='';this.style.borderColor='rgba(196,162,101,.12)'"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--gold-l)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:10px"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><div style="font-weight:800;font-size:.95rem;margin-bottom:4px">جودة مضمونة</div><div style="font-size:.8rem">منتجات مختارة بعناية وجودة عالية</div></div>
+      <div style="background:rgba(255,255,255,.08);padding:28px 16px;border-radius:var(--r);text-align:center;border:1px solid rgba(196,162,101,.12);transition:transform .3s,border-color .3s" onmouseover="this.style.transform='translateY(-3px)';this.style.borderColor='rgba(196,162,101,.3)'" onmouseout="this.style.transform='';this.style.borderColor='rgba(196,162,101,.12)'"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--gold-l)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:10px"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg><div style="font-weight:800;font-size:.95rem;margin-bottom:4px">استبدال وإرجاع</div><div style="font-size:.8rem">راحة بالك مع سياسة إرجاع مرنة</div></div>
     </div>
   </div>
 </section>
@@ -510,12 +539,12 @@ a{text-decoration:none;color:inherit}
       <div class="footer-col"><h4>روابط سريعة</h4><a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false">الرئيسية</a><a href="#" onclick="document.getElementById('allSec').scrollIntoView({behavior:'smooth'});return false">المنتجات</a><a href="https://wa.me/9647893799524" target="_blank" rel="noopener noreferrer">واتساب</a></div>
       <div class="footer-col"><h4>معلومات التوصيل</h4><p>التوصيل لجميع محافظات العراق</p><p>سعر التوصيل: 5,000 د.ع</p><p>الدفع عند الاستلام فقط</p><p style="margin-top:12px"><a href="#" onclick="openAdmin();return false" style="color:var(--gold-l)">إدارة المنتجات</a></p></div>
     </div>
-    <div class="footer-copy">© 2025 شغلاتي HOME — جميع الحقوق محفوظة</div>
+    <div class="footer-copy">© 2026 شغلاتي HOME — جميع الحقوق محفوظة</div>
   </div>
 </footer>
 
 <!-- Floating WA -->
-<a class="wa-float" href="https://wa.me/9647893799524" target="_blank" rel="noopener noreferrer" aria-label="واتساب">WA</a>
+<a class="wa-float" href="https://wa.me/9647893799524" target="_blank" rel="noopener noreferrer" aria-label="واتساب"><svg width="28" height="28" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>
 
 <!-- Cart Overlay -->
 <div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
@@ -560,7 +589,7 @@ a{text-decoration:none;color:inherit}
       <div class="adm-d" id="admDash">
         <div class="adm-s"><div class="adm-sh">بحث بالرمز</div><div class="adm-sb"><input class="adm-i" type="text" id="admSrch" placeholder="SH-1001" dir="ltr" style="text-align:right" maxlength="20"><div id="srchRes" style="margin-top:8px"></div></div></div>
         <div class="adm-s"><div class="adm-sh">إضافة منتج جديد</div><div class="adm-sb">
-          <div class="adm-row"><div><label class="fl">رمز المنتج</label><input class="adm-i" type="text" id="aCode" maxlength="20" dir="ltr" style="text-align:right"></div><div><label class="fl">القسم</label><select class="adm-sel" id="aCat"><option value="كهربائيات">كهربائيات</option><option value="أدوات منزلية">أدوات منزلية</option><option value="ألعاب">ألعاب أطفال</option><option value="هدايا">هدايا</option></select></div></div>
+          <div class="adm-row"><div><label class="fl">رمز المنتج</label><input class="adm-i" type="text" id="aCode" maxlength="20" dir="ltr" style="text-align:right"></div><div><label class="fl">القسم</label><select class="adm-sel" id="aCat"><option value="أجهزة كهربائية">أجهزة كهربائية</option><option value="أدوات منزلية">أدوات منزلية</option><option value="ألعاب">ألعاب أطفال</option><option value="هدايا">هدايا</option><option value="أجهزة العناية">أجهزة العناية</option><option value="أدوات مطبخ">أدوات مطبخ</option><option value="عدد وأدوات">عدد وأدوات</option><option value="حقائب">حقائب</option><option value="مستلزمات التخييم">مستلزمات التخييم</option><option value="منتجات العناية">منتجات العناية</option><option value="إلكترونيات">إلكترونيات</option><option value="اكسسوارات">اكسسوارات</option></select></div></div>
           <div class="adm-row full"><div><label class="fl">اسم المنتج</label><input class="adm-i" type="text" id="aName" maxlength="150"></div></div>
           <div class="adm-row"><div><label class="fl">السعر (د.ع)</label><input class="adm-i" type="number" id="aPrice" min="0"></div><div><label class="fl">السعر قبل الخصم</label><input class="adm-i" type="number" id="aOld" min="0"></div></div>
           <div class="adm-row full"><div><label class="fl">وصف المنتج</label><textarea class="adm-ta" id="aDesc" rows="3" maxlength="2000"></textarea></div></div>
@@ -578,11 +607,11 @@ a{text-decoration:none;color:inherit}
 <div class="toast" id="toast"></div>
 
 <script>
-var WA='9647893799524',DEL=5000,PIN_H='ed946f65d2c785d90e827c5ffd879ce3b49c68d4c88013074176a7e73bc58bcf',VCATS=['كهربائيات','أدوات منزلية','ألعاب','هدايا'],MFS=5*1024*1024,MFC=10;
+var WA='9647893799524',DEL=5000,PIN_H='ed946f65d2c785d90e827c5ffd879ce3b49c68d4c88013074176a7e73bc58bcf',VCATS=['أجهزة كهربائية','أدوات منزلية','ألعاب','هدايا','أجهزة العناية','أدوات مطبخ','عدد وأدوات','حقائب','مستلزمات التخييم','منتجات العناية','إلكترونيات','اكسسوارات'],MFS=5*1024*1024,MFC=10;
 /*@PRODUCTS@*/
 var BP=[];
 /*@/PRODUCTS@*/
-var CBG={'كهربائيات':'#EBF3FB','أدوات منزلية':'#E6F7F4','ألعاب':'#FFF0F4','هدايا':'#F3EEFB'};
+var CBG={'أجهزة كهربائية':'#EBF3FB','أدوات منزلية':'#E6F7F4','ألعاب':'#FFF0F4','هدايا':'#F3EEFB','أجهزة العناية':'#FDEFF4','أدوات مطبخ':'#FFF3E6','عدد وأدوات':'#EEF1F5','حقائب':'#F4EEE6','مستلزمات التخييم':'#EAF6EC','منتجات العناية':'#FBEEF7','إلكترونيات':'#E9EEFB','اكسسوارات':'#FBF4E6'};
 var curFilt='الكل',curOrd=null,admAuth=false,admMedia=[],dIdx=0,pinAtt=0,pinLock=false;
 var cart=[];
 
@@ -637,7 +666,7 @@ function renderHero(){
       heroTimer=setInterval(function(){goHero(heroIdx+1)},5000);
     }
   } else {
-    slider.innerHTML='<div class="hero-slide ctn"><div class="hero-content"><div class="hero-tag">افتتاح جديد</div><h1>كل شي يخص <b>بيتك</b>…<br>بمكان واحد</h1><p class="hero-desc">أجهزة كهربائية • أدوات منزلية • ألعاب أطفال • هدايا<br>توصيل لكل العراق — دفع عند الاستلام</p><div class="hero-actions"><a class="btn btn-primary" href="#allSec">تسوّق الآن</a></div></div><div class="hero-img"><div class="hero-img-wrap"><div class="hero-placeholder">شغلاتي HOME</div></div></div></div>';
+    slider.innerHTML='<div class="hero-slide ctn"><div class="hero-content"><h1>كل شي يخص <b>بيتك</b>…<br>بمكان واحد</h1><p class="hero-desc">أجهزة كهربائية • أدوات منزلية • ألعاب أطفال • هدايا<br>توصيل لكل العراق — دفع عند الاستلام</p><div class="hero-actions"><a class="btn btn-primary" href="#allSec">تسوّق الآن</a></div></div><div class="hero-img"><div class="hero-img-wrap"><div class="hero-placeholder">شغلاتي HOME</div></div></div></div>';
     dots.innerHTML='';
     navs.forEach(function(n){n.style.display='none'});
   }
@@ -687,8 +716,8 @@ function renderAll(){
 
 function filterCat(c){
   curFilt=c;renderAll();
-  document.querySelectorAll('.cat-card').forEach(function(el){el.classList.remove('active')});
-  if(c!=='الكل')document.querySelectorAll('.cat-card').forEach(function(el){if(el.textContent.indexOf(c)!==-1)el.classList.add('active')});
+  document.querySelectorAll('.cat-circle').forEach(function(el){el.classList.remove('active')});
+  if(c!=='الكل')document.querySelectorAll('.cat-circle').forEach(function(el){if(el.textContent.indexOf(c)!==-1)el.classList.add('active')});
   document.getElementById('allSec').scrollIntoView({behavior:'smooth'});
 }
 
@@ -827,9 +856,48 @@ function closeMM(){document.getElementById('mobileMenu').classList.remove('open'
 /* ── Global events ── */
 document.querySelectorAll('.modal-ov').forEach(function(ov){ov.addEventListener('click',function(e){if(e.target===ov){if(ov.id==='orderModal')closeOrd();else if(ov.id==='adminModal')closeAdm();else if(ov.id==='detailModal')closeDet()}})});
 document.addEventListener('keydown',function(e){if(e.key==='Escape'){if(document.getElementById('detailModal').classList.contains('open'))closeDet();else if(document.getElementById('orderModal').classList.contains('open'))closeOrd();else if(document.getElementById('adminModal').classList.contains('open'))closeAdm();else if(document.getElementById('cartDrawer').classList.contains('open'))closeCart();else if(document.getElementById('mobileMenu').classList.contains('open'))closeMM()}});
-document.querySelectorAll('.cat-card').forEach(function(c){c.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();c.click()}})});
 
+var secObs=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('visible');secObs.unobserve(e.target)}})},{threshold:0.08});
+document.querySelectorAll('.sec').forEach(function(s){secObs.observe(s)});
 renderPage();renderCart();
+
+/* ===== Motion (motion.dev) — تحسينات حركية عالمية ===== */
+(function(){
+  var RM=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(RM)return;
+  var s=document.createElement('script');
+  s.src='/vendor/motion.js';
+  s.onload=function(){
+    var M=window.Motion;if(!M)return;
+    var animate=M.animate,inView=M.inView,stagger=M.stagger;
+    var EASE=[.22,1,.36,1];
+    /* ظهور متدرّج لبطاقات كل قسم عند دخوله للشاشة */
+    function reveal(root){
+      (root||document).querySelectorAll('.sec').forEach(function(sec){
+        if(sec.dataset.mo)return;sec.dataset.mo='1';
+        inView(sec,function(){
+          var els=sec.querySelectorAll('.cat-circle,.prod-card,.rev-card,.why-card,.sec-title,.sec-sub,.hero-content>*,.hero-img-wrap');
+          if(!els.length)return;
+          els.forEach(function(el){el.style.opacity='0'});
+          animate(els,{opacity:[0,1],transform:['translateY(26px)','translateY(0)']},{delay:stagger(.07),duration:.65,easing:EASE});
+        },{amount:.12});
+      });
+    }
+    reveal();
+    /* تفاعل ضغط ناعم على الأزرار الأساسية */
+    document.addEventListener('pointerdown',function(e){
+      var b=e.target.closest&&e.target.closest('.btn,.cat-circle,.add-cart-btn');
+      if(b)animate(b,{scale:.96},{duration:.12,easing:EASE});
+    });
+    document.addEventListener('pointerup',function(e){
+      var b=e.target.closest&&e.target.closest('.btn,.cat-circle,.add-cart-btn');
+      if(b)animate(b,{scale:1},{duration:.22,easing:[.34,1.56,.64,1]});
+    });
+    /* إعادة فحص بعد إعادة رسم الصفحة (فلترة الأقسام) */
+    window.__moReveal=reveal;
+  };
+  document.head.appendChild(s);
+})();
 </script>
 </body>
 </html>

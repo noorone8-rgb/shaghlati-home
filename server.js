@@ -4,6 +4,7 @@ const cors = require('cors');
 const path = require('path');
 const cron = require('node-cron');
 const db = require('./config/db');
+const { UPLOADS_DIR } = require('./config/paths');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -11,6 +12,8 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+// Serve uploaded files from the (possibly persistent) uploads directory.
+app.use('/uploads', express.static(UPLOADS_DIR));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // API Routes
